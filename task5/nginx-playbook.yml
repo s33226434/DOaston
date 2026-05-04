@@ -1,0 +1,29 @@
+---
+- name: Установка и настройка Nginx
+  hosts: webservers
+  become: true
+
+  tasks:
+    - name: Обновить кеш apt и все пакеты до последней версии
+      ansible.builtin.apt:
+        update_cache: true
+        upgrade: dist
+
+    - name: Установить Nginx
+      ansible.builtin.apt:
+        name: nginx
+        state: present
+
+    - name: Заменить стандартную страницу Nginx
+      ansible.builtin.copy:
+        src: files/index.html
+        dest: /var/www/html/index.html
+        owner: www-data
+        group: www-data
+        mode: '0644'
+
+    - name: Проверить, что Nginx запущен и включен в автозагрузку
+      ansible.builtin.service:
+        name: nginx
+        state: started
+        enabled: true
